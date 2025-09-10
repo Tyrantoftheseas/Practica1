@@ -1,0 +1,5 @@
+Práctica de Git completada
+- Repositorio público creado
+- Rama main establecida
+- Rama dev creada
+- Archivo de prueba agregado
