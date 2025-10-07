@@ -1,0 +1,46 @@
+name: CI con Notificación a ntfy.sh
+
+# Se ejecuta cuando hay un push a la rama main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Checkout del código
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar Node.js
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Paso 3: Ejecutar el programa
+      - name: Ejecutar Hola Mundo
+        run: node index.js
+
+      # Paso 4: Enviar notificación de éxito a ntfy.sh
+      - name: Notificar éxito en ntfy.sh
+        if: success()
+        run: |
+          curl -H "Title: ✅ Build Exitoso - ITLA DevOps" \
+               -H "Priority: default" \
+               -H "Tags: white_check_mark,rocket" \
+               -d "El código fue desplegado exitosamente en la rama main por ${{ github.actor }}. Commit: ${{ github.event.head_commit.message }}" \
+               https://ntfy.sh/devops-itla
+
+      # Paso 5: Enviar notificación de fallo a ntfy.sh
+      - name: Notificar fallo en ntfy.sh
+        if: failure()
+        run: |
+          curl -H "Title: ❌ Build Fallido - ITLA DevOps" \
+               -H "Priority: high" \
+               -H "Tags: warning,x" \
+               -d "El build ha fallado en la rama main. Actor: ${{ github.actor }}. Revisa los logs en GitHub Actions." \
+               https://ntfy.sh/devops-itla
